@@ -1,7 +1,7 @@
 # Advanced Cross-Platform Packager
 
 
-Advanced cross-platform packer is a software for creating user-friendly packages for different operating systems with built-in data compression.
+Advanced cross-platform packer is a software for creating user-friendly packages for different operating systems with built-in data compression. The acp project uses only native libraries.
 
 These systems are currently supported:
 

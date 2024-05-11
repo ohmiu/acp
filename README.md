@@ -22,4 +22,4 @@ Usage:
 `./acp all` - Add all files in all folders in the "." directory to package.json
 
 ### Warning
-It is not possible to write too much data into a packet due to technical reasons, which may be fixed in the future.
+It is not possible to write too much data into a packet due to technical reasons.

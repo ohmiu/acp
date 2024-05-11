@@ -13,10 +13,10 @@ These systems are currently supported:
 
 Usage:
 
-`acp blank` - Create an empty package project in this directory
+`./acp blank` - Create an empty package project in this directory
 
-`acp build` - Build the package in the current directory
+`./acp build` - Build the package in the current directory
 
-`acp install <package.acpe>` - Install the package from the file
+`./acp install <package.acpe>` - Install the package from the file
 
-`acp all` - Add all files in all folders in the "." directory to package.json
+`./acp all` - Add all files in all folders in the "." directory to package.json

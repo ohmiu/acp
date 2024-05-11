@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-
 import json
 import sys
 import zlib
@@ -7,6 +6,7 @@ import os
 import base64
 import platform
 import traceback
+import psutil
 from datetime import datetime
 
 class Project:
@@ -43,7 +43,7 @@ class Project:
         print('Description: ' + package_info['description'])
         print('Target OS: ' + package_info['os'])
         print('Version: ' + package_info['version'])
-        print('Files: ' + str(package_info['addfiles']))
+        print('Files count: ' + str(len(package_info['addfiles'])))
         print('Path to install: ' + package_info['installpath'])
         atc = None
         while not atc == 'y': 
@@ -56,6 +56,16 @@ class Project:
             if not os.path.exists('./'+file):
                 print(f'ERR - File {file} does not exist')
                 file_err = 1
+        total_files_size = 0
+        for file in package_info['addfiles']:
+            total_files_size += os.path.getsize('./'+file)
+        print('Total files size: '+str(total_files_size)+' bytes')
+        if psutil.virtual_memory().available / 1.8 <= total_files_size:
+            acc = None
+            while not acc == 'y':
+                acc = input('Most likely the program will fail to build the package due to lack of system resources.\nContinue? (y/n): ')
+                if acc == 'n':
+                    os._exit(1)
         if file_err == 1:
             print('Some files does not exist in current directory, fix and try again'); os._exit(1)
         print('Writing basic information...')
@@ -67,13 +77,16 @@ class Project:
         print('Writing files...')
         for file in package_info['addfiles']:
             print(f'Reading {file}...')
-            rdata = open(f'./{file}', 'rb').read()
+            with open(f'./{file}', 'rb') as ufile:
+                rdata = ufile.read()
             print(f'Encoding {file}...')
             bdata = base64.b64encode(rdata).decode()
             print(f'Writing {file}...')
-            open('package.acpe', 'a').write(f'file:::{file}:::{bdata}\n')
+            with open('package.acpe', 'a') as ufile:
+                ufile.write(f'file:::{file}:::{bdata}\n')
         print('Compressing...')
-        data = open('package.acpe', 'rb').read()
+        with open('package.acpe', 'rb') as ufile:
+            data = ufile.read()
         os.remove('package.acpe')
         altnamebb = package_info['name']
         with open(f'{altnamebb}-{platform.system()}.acpe', 'wb') as endfile:
@@ -106,7 +119,8 @@ class Installer:
     def install_package(filename: str):
         if not os.path.exists(f'./{filename}'):
             print(f'File "{filename}" does not exist in this folder.'); os._exit(1)
-        cdata = open(f'./{filename}', 'rb').read()
+        with open(f'./{filename}', 'rb') as ufile:
+            cdata = ufile.read()
         print('Decompressing...')
         cdata = zlib.decompress(cdata).decode()
         print('Unpacking...')
@@ -236,5 +250,6 @@ if __name__ == "__main__":
             Info.show_help_message()
         else:
             tback = traceback.format_exc()
-            open('./error.log', 'a').write(f'{str(datetime.now())} - {tback}\n')
+            with open('./error.log', 'a') as ufile:
+                ufile.write(f'{str(datetime.now())} - {tback}\n')
             print('[CRITICAL] - Unknown Error - saved in error.log')
